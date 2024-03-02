@@ -1,0 +1,7 @@
+total 36
+drwxrwxr-x  2 040312-lsy 040312-lsy  4096 Mar  2 16:30 .
+drwxrwxr-x 16 040312-lsy 040312-lsy  4096 Feb 29 21:54 ..
+-rw-rw-r--  1 040312-lsy 040312-lsy     0 Mar  2 16:30 log.txt
+-rw-rw-r--  1 040312-lsy 040312-lsy    74 Feb 29 21:05 Makefile
+-rwxrwxr-x  1 040312-lsy 040312-lsy 13904 Mar  2 16:30 mybash
+-rw-rw-r--  1 040312-lsy 040312-lsy  4600 Mar  2 16:30 myshell.c

@@ -4,7 +4,18 @@
 #include<unistd.h>
 #include<sys/types.h>
 #include<sys/wait.h>
+#include<ctype.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
+
+#define NoneRedir 0
+#define InputRedir 1
+#define OutputRedir 2
+#define AppendRedir 3
+char *filename = NULL;
+int Redir = 0;
 #define NUM 1024
 #define SIZE 100
 //#define Debug 1
@@ -70,6 +81,27 @@ int execute(char* argv[])
     else if(id == 0)
     {
         //child
+        int fd = 0;
+        if(Redir == InputRedir)
+        {
+             fd = open(filename,O_RDONLY);
+             dup2(fd,0);
+        }
+        else if(Redir == OutputRedir)
+        {
+            fd = open(filename,O_WRONLY | O_CREAT | O_TRUNC ,0666);
+            dup2(fd,1);
+        }
+        else if(Redir == AppendRedir)
+        {
+            fd = open(filename,O_WRONLY | O_CREAT | O_APPEND ,0666);
+            dup2(fd,1);
+        }
+        else 
+        {
+
+        }
+
         execvp(argv[0],argv);
         exit(1);
     }
@@ -132,15 +164,61 @@ int doBuildin(char* argv[])
     return 0;
 }
 
+#define SkipSpace(pos) do{ while(isspace(*pos)) pos++; }while(0)
+
+void checkRedir(char command[],size_t len)
+{
+    char* end = command + len - 1;
+    char* start = command;
+    while(end > start)
+    {
+        if(*end == '<')
+        {
+            *end = '\0';
+            filename = end + 1;
+            SkipSpace(filename);
+            Redir = InputRedir;
+            break;
+        }
+        else if(*end == '>')
+        {
+            if(*(end - 1) == '>')
+            {
+                *(end - 1) = '\0';
+                filename = end + 1;
+                SkipSpace(filename);
+                Redir = AppendRedir;
+                break;
+            }
+            else 
+            {
+                *end = '\0';
+                filename = end + 1;
+                SkipSpace(filename);
+                Redir = OutputRedir;
+                break;
+            }
+        }
+        else 
+        {
+            end--;
+        }
+    }
+}
+
 int main()
 {
     while(1)
     {
+        filename = NULL;
+        Redir = 0;
         char usercommand[NUM];
         char* argv[SIZE];
         //1.  打印提示符&&获取用户命令字符串
         int n = getCommand(usercommand,sizeof(usercommand));
         if(n <= 0) continue;
+
+        checkRedir(usercommand,strlen(usercommand));
         //printf("%s",usercommand);
         //2.分割字符串
         commandSplit(usercommand,argv);
