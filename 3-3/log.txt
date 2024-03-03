@@ -1,0 +1,4 @@
+system: hello write
+C: hello printf
+C: hello fprintf
+C: hello fputs
