@@ -1,11 +1,17 @@
 #pragma once
 #include<iostream>
+#include<sys/types.h>
+#include<sys/stat.h>
+#include<stdio.h>
+#include<fcntl.h>
+#include<stdlib.h>
 #include<sys/ipc.h> 
 #include<sys/shm.h>
 #include<cstring>
 #include<cerrno>
 using namespace std;
 
+#define FILENAME "fifo"
 const int size = 4096;
 
 const std::string pathname = "/home/040312-lsy/lesson/3-13/shm";
@@ -47,4 +53,17 @@ int CreatShm(key_t key)
 int GetShm(key_t key)
 {
     return CreatShmHlper(key, IPC_CREAT);
+}
+
+bool Makefifo()
+{
+     //1.创建一个管道文件
+    int n = mkfifo(FILENAME,0666);
+    if(n < 0)
+    {
+        cerr << "errno: " << errno << ", errstring: " << strerror(errno) << endl;
+        return false;
+    }
+    cout << "mkfifo success..." << endl;
+    return true;
 }
