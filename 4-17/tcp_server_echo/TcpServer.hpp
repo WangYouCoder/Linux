@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include "Comm.hpp"
 #include <unistd.h>
+#include <sys/wait.h>
 
 const static int default_backlog = 5;
 
@@ -33,6 +34,11 @@ public:
         }
         lg.LogMessage(Debug, "create socket success, socket: %d, errno code: %d, errno string: %s\n", _listensock, errno, strerror(errno));
         
+        // 解决一些少量的bind失败的问题
+        int opt = 1;
+        setsockopt(_listensock, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt));
+
+
         // 2. 填充本地网络信息并bind
         struct sockaddr_in local;
         memset(&local, 0, sizeof(local));
@@ -103,9 +109,33 @@ public:
             // 获取链接成功
             lg.LogMessage(Debug, "accept socket success, get a new sockfd: %d\n", sockfd);
 
-            // 5. 提供服务
-            Service(sockfd);
-            close(sockfd);
+            // // 5. 提供服务  v1
+            // Service(sockfd);
+            // close(sockfd);
+
+            // v2 多进程
+            pid_t id = fork();
+            if(id < 0)
+            {
+                close(sockfd);
+                countinue;
+            }
+            else if(id == 0)
+            {
+                // child
+                close(_listensock);
+            }
+            else
+            {
+                close(sockfd);
+                pid_t rid = waitpid(id, nullptr, 0);
+                if(rid == id)
+                {
+
+                }
+                else
+            }
+            
         }
     }
     ~TcpServer() {}
