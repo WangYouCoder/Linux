@@ -114,27 +114,61 @@ public:
             // close(sockfd);
 
             // v2 多进程
-            pid_t id = fork();
-            if(id < 0)
-            {
-                close(sockfd);
-                countinue;
-            }
-            else if(id == 0)
-            {
-                // child
-                close(_listensock);
-            }
-            else
-            {
-                close(sockfd);
-                pid_t rid = waitpid(id, nullptr, 0);
-                if(rid == id)
-                {
+            // pid_t id = fork();
+            // if(id < 0)
+            // {
+            //     close(sockfd);
+            //     continue;
+            // }
+            // else if(id == 0)
+            // {
+            //     // child
+            //     close(_listensock);
+            //     if(fork() > 0)
+            //         exit(0);
+                
+            //     // 孤儿进程
+            //     Service(sockfd);
+            //     close(sockfd);
+            //     exit(0);
+            // }
+            // else
+            // {
+            //     close(sockfd);
+            //     pid_t rid = waitpid(id, nullptr, 0);
+            //     if(rid == id)
+            //     {
 
-                }
-                else
-            }
+            //     }
+            //     else
+            // }
+
+            // v3 基于信号量
+            // signal(SIGCHLD, SIG_IGN); // 在Linux环境中，如果对SIG_IGN进行忽略，子进程退出的时候，会自动的释放自己的资源，不会产生僵尸进程
+            // pid_t id = fork();
+            // if(id < 0)
+            // {
+            //     close(sockfd);
+            //     continue;
+            // }
+            // else if(id == 0)
+            // {
+            //     // child
+            //     close(_listensock);
+            //     Service(sockfd);
+            //     close(sockfd);
+            //     exit(0);
+            // }
+            // else
+            // {
+            //     close(sockfd);
+            //     pid_t rid = waitpid(id, nullptr, 0);
+            //     if(rid == id)
+            //     {
+
+            //     }
+            //     else
+            // }
             
         }
     }
