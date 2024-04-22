@@ -6,7 +6,13 @@
 
 void HandlerRequest(WY::Socket *sockp)
 {
-    std::cout << "in HandlerRequest" << std::endl;
+    //std::cout << "in HandlerRequest" << std::endl;
+    while(true)
+    {
+        struct Request req;
+        recv(sockp->GetSockfd(), &req, sizeof(req), 0);
+        req.Debug();
+    }
 }
 
 // ./server port

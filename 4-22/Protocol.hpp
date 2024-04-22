@@ -1,11 +1,25 @@
 #pragma once
 #include <iostream>
 #include <memory>
+
 class Request
 {
 public:
+    Request()
+    {}
     Request(int x, int y, char op) :_data_x(x), _data_y(y), _oper(op)
     {}
+    void Debug()
+    {
+        std::cout << "_data_x: " << _data_x << std::endl;
+        std::cout << "_data_y: " << _data_y << std::endl;
+        std::cout << "_oper: " << _oper << std::endl;
+    }
+    void Inc()
+    {
+        _data_x++;
+        _data_y++;
+    }
 private:
     int _data_x; // 第一个数据
     int _data_y; // 第二个数据

@@ -26,6 +26,13 @@ int main(int argc, char *argv[])
     //std::unique_ptr<Factory> factory = std::make_unique<Factory>();
     std::unique_ptr<Factory> factory(new Factory());
     std::shared_ptr<Request> req = factory->BuildRequest(10, 20, '+');
+    
+    while(true)
+    {
+        req->Inc();
+        send(s->GetSockfd(), &(*req), sizeof(*req), 0);
+        sleep(1);
+    }
 
     s->CloseSocket();
     //sleep(10);
