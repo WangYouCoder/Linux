@@ -2,6 +2,11 @@
 #include <iostream>
 #include <memory>
 
+const std::string ProtSep = " ";
+
+// 1. 解决结构化数据的序列和反序列化的问题
+// 2. 还要解决用户区分报文边界 --- 数据包粘报问题
+
 class Request
 {
 public:
@@ -20,6 +25,21 @@ public:
         _data_x++;
         _data_y++;
     }
+
+    // 序列化：结构化数据 -> 字符串
+    bool Serialize(std::string *out)
+    {
+        std::string package = std::to_string(_data_x) + ProtSep + _oper + ProtSep + std::to_string(_data_y);
+        return true;
+    }
+
+    // 反序列化：字符串 -> 结构化数据
+    bool Deserialize()
+    {
+        
+    }
+
+
 private:
     int _data_x; // 第一个数据
     int _data_y; // 第二个数据
@@ -33,6 +53,20 @@ public:
     {}
     Response(int result, int code) :_result(result), _code(code)
     {}
+
+    // 序列化：结构化数据 -> 字符串
+    bool Serialize(std::string *out)
+    {
+        *out = std::to_string(_result) + ProtSep + std::to_string(_code);
+        return true;
+    }
+
+    // 反序列化：字符串 -> 结构化数据
+    bool Deserialize()
+    {
+
+    }
+
 private:
     int _result; // 运算结果
     int _code;   // 运算状态

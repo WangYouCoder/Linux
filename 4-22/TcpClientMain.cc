@@ -23,6 +23,7 @@ int main(int argc, char *argv[])
     std::string  message = "hello world";
     //write(s->GetSockfd(), message.c_str(), message.size());
     
+    // 当前centos不支持c++14,所以不支持make_unique...........
     //std::unique_ptr<Factory> factory = std::make_unique<Factory>();
     std::unique_ptr<Factory> factory(new Factory());
     std::shared_ptr<Request> req = factory->BuildRequest(10, 20, '+');
