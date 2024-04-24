@@ -3,14 +3,44 @@
 #include <memory>
 
 const std::string ProtSep = " ";
+const std::string LineBreakSep = "\n";
+
 
 // 1. 解决结构化数据的序列和反序列化的问题
 // 2. 还要解决用户区分报文边界 --- 数据包粘报问题
 
+std::string Encode(std::string &message)
+{
+    std::string len = std::to_string(message.size());
+    std::string package = len + LineBreakSep + message + LineBreakSep;
+    return package;
+}
+
+bool Decode(std::string &package, std::string *message)
+{
+    // pos 是"\n"的位置
+    auto pos = package.find(LineBreakSep);
+    if(pos == std::string::npos) return false;
+    std::string lens = package.substr(0, pos);
+    int messagelen = stoi(lens);
+
+    //             "len"         "x op y"          两个"\n"
+    int total = lens.size() + messagelen + 2 * LineBreakSep.size();
+    if(package.size() < total) return false;
+    // package中至少有一个合法的报文
+    *message = package.substr(pos + LineBreakSep.size(), messagelen);
+
+    // 将我们处理过的报文去除掉
+    package.erase(0, total);
+    return true;
+
+    // 可以在外部使用while循环不断取出合法的报文，一直到返回错误为止
+}
+
 class Request
 {
 public:
-    Request()
+    Request() :_data_x(0), _data_y(0),_oper(0)
     {}
     Request(int x, int y, char op) :_data_x(x), _data_y(y), _oper(op)
     {}
@@ -29,16 +59,36 @@ public:
     // 序列化：结构化数据 -> 字符串
     bool Serialize(std::string *out)
     {
-        std::string package = std::to_string(_data_x) + ProtSep + _oper + ProtSep + std::to_string(_data_y);
+        *out = std::to_string(_data_x) + ProtSep + _oper + ProtSep + std::to_string(_data_y);
         return true;
     }
 
     // 反序列化：字符串 -> 结构化数据
-    bool Deserialize()
+    bool Deserialize(std::string& in)
     {
-        
+        auto left = in.find(ProtSep);
+        if(left == std::string::npos) 
+            return false;
+        auto right = in.rfind(ProtSep);
+        if(right == std::string::npos) 
+            return false; 
+
+        _data_x = std::stoi(in.substr(0, left));
+        _data_y = std::stoi(in.substr(right + ProtSep.size()));
+        std::string oper = in.substr(left + ProtSep.size(), right - (left + ProtSep.size()));
+        if(oper.size() != 1) 
+            return false;
+        _oper = oper[0];
+        return true;
     }
 
+    // char GetOper
+    // {
+    //     return _oper;
+    // }
+    int GetY()  { return _data_y; }
+    int GetX()  { return _data_x; }
+    char GetOper()   {return _oper; }
 
 private:
     int _data_x; // 第一个数据
@@ -49,7 +99,7 @@ private:
 class Response
 {
 public:
-    Response()
+    Response() :_result(0), _code(0)
     {}
     Response(int result, int code) :_result(result), _code(code)
     {}
@@ -62,10 +112,19 @@ public:
     }
 
     // 反序列化：字符串 -> 结构化数据
-    bool Deserialize()
+    bool Deserialize(std::string& in)  // "_result _code"
     {
-
+        auto pos = in.find(ProtSep);
+        if(pos == std::string::npos) return false;
+        _result = std::stoi(in.substr(0, pos));
+        _code = std::stoi(in.substr(pos + ProtSep.size()));
+        return true;
     }
+
+    void SetResult(int res) {_result = res;}
+    void SetCode(int code) {_code = code;}
+    int GetResult() { return _result; }
+    int GetCode() { return _code; }
 
 private:
     int _result; // 运算结果

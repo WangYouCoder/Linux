@@ -37,6 +37,8 @@ namespace WY
         virtual int GetSockfd() = 0;
         virtual void SetSockfd(int sockfd) = 0;
         virtual void CloseSocket() = 0;
+        virtual bool Recv(std::string *buffer, int size) = 0;
+        virtual void Send(std::string &send_str) = 0;
 
     public:
         // server 服务端
@@ -139,6 +141,27 @@ namespace WY
             if (_sockfd > defaultsockfd)
                 close(_sockfd);
         }
+
+        bool Recv(std::string *buffer, int size)
+        {
+            char inbuffer[size];
+            ssize_t n = recv(_sockfd, inbuffer, size - 1, 0);
+            if(n > 0) 
+            {
+                inbuffer[n] = 0;
+                *buffer += inbuffer;
+                return true;
+            }
+            else if(n == 0 || n < 0)
+            {
+                return false;
+            }
+        }
+        void Send(std::string &send_str)
+        {
+            send(_sockfd, send_str.c_str(),send_str.size(), 0);
+        }
+
 
     private:
         int _sockfd;
