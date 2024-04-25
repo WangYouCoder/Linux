@@ -4,7 +4,7 @@
 #include <iostream>
 #include <memory>
 #include "Calculate.hpp"
-
+#include "daemon.hpp"
 // 网络只负责IO发送
 // HandlerRequest字节流数据解析和调用业务处理方法
 // 处理报文的方法
@@ -53,6 +53,8 @@ int main(int argc, char *argv[])
         return 1;
     }
     uint16_t localport = std::stoi(argv[1]);
+    
+    Daemon(false, false);
     std::unique_ptr<TcpServer> svr(new TcpServer(localport, HandlerRequest));
     svr->Loop();
     return 0;

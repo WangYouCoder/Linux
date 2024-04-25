@@ -1,6 +1,9 @@
 #pragma once
 #include <iostream>
 #include <memory>
+#include <jsoncpp/json/json.h>
+
+//#define SelfDefine 1
 
 const std::string ProtSep = " ";
 const std::string LineBreakSep = "\n";
@@ -59,13 +62,24 @@ public:
     // 序列化：结构化数据 -> 字符串
     bool Serialize(std::string *out)
     {
+#ifdef SelfDefine
         *out = std::to_string(_data_x) + ProtSep + _oper + ProtSep + std::to_string(_data_y);
         return true;
+#else
+        Json::Value root;
+        root["datax"] = _data_x;
+        root["datay"] = _data_y;
+        root["oper"] = _oper;
+        Json::FastWriter writer;
+        *out = writer.write(root);
+        return true;
+#endif
     }
 
     // 反序列化：字符串 -> 结构化数据
     bool Deserialize(std::string& in)
     {
+#ifdef SelfDefine
         auto left = in.find(ProtSep);
         if(left == std::string::npos) 
             return false;
@@ -80,6 +94,18 @@ public:
             return false;
         _oper = oper[0];
         return true;
+#else
+    Json::Value root;
+    Json::Reader reader;
+    bool res = reader.parse(in, root);
+    if(res) 
+    {
+        _data_x = root["datax"].asInt();
+        _data_y = root["datay"].asInt();
+        _oper = root["oper"].asInt();
+    }
+    return res;
+#endif
     }
 
     // char GetOper
@@ -107,18 +133,39 @@ public:
     // 序列化：结构化数据 -> 字符串
     bool Serialize(std::string *out)
     {
+#ifdef SelfDefine
         *out = std::to_string(_result) + ProtSep + std::to_string(_code);
         return true;
+#else
+        Json::Value root;
+        root["result"] = _result;
+        root["code"] = _code;
+        Json::FastWriter writer;
+        *out = writer.write(root);
+        return true;
+#endif
     }
 
     // 反序列化：字符串 -> 结构化数据
     bool Deserialize(std::string& in)  // "_result _code"
     {
+#ifdef SelfDefine
         auto pos = in.find(ProtSep);
         if(pos == std::string::npos) return false;
         _result = std::stoi(in.substr(0, pos));
         _code = std::stoi(in.substr(pos + ProtSep.size()));
         return true;
+#else
+        Json::Value root;
+        Json::Reader reader;
+        bool res = reader.parse(in, root);
+        if(res) 
+        {
+           _result = root["result"].asInt();
+           _code = root["code"].asInt();
+        }
+      return res;
+#endif
     }
 
     void SetResult(int res) {_result = res;}
