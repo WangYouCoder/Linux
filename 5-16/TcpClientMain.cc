@@ -19,7 +19,20 @@ int main(int argc, char* argv[])
         return 0;
     }    
     std::cerr << "connect " << serverip << ":" << serverport << " success" << std::endl;
-    sleep(10);
 
+    // std::string message = "hello world";
+    // write(connectfd->GetSockfd(), message.c_str(), message.size());
+
+    std::unique_ptr<Factory> factory(new Factory());
+    std::shared_ptr<Request> req = factory->BuildRequest(10, 20, '+');
+
+    while(true)
+    {
+        req->Inc();
+        send(connectfd->GetSockfd(), &(*req), sizeof(*req), 0);
+        sleep(1);
+    }
+
+    connectfd->CloseSockfd();
     return 0;
 }
