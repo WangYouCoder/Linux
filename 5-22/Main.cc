@@ -23,6 +23,9 @@ std::string HandlerHttpRequest(std::string &request)
 
     std::string httpresponse = httpstatusline + httpheader + content;
     return httpresponse;
+
+    std::cout << "hello" << std::endl;
+    return "";
 }
 
 // ./server port
