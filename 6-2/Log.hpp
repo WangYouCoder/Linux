@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <pthread.h>
 enum
 {
     Debug = 0,
@@ -85,8 +86,11 @@ public:
         logname += levelstr;
         WriteLogToOnefile(logname, message);
     }
+
+    pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
     void Write(const std::string& levelstr, const std::string& message)
     {
+        pthread_mutex_lock(&lock);
         switch(stype)
         {
             case Screen:
@@ -101,6 +105,7 @@ public:
             default:
                 break;
         }
+        pthread_mutex_unlock(&lock);
     }
     void LogMessage(int level, const char* format, ...)
     {
