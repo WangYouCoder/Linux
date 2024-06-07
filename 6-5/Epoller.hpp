@@ -1,3 +1,11 @@
+
+// Epoll功能表
+
+// 1.创建epoll模型            epoll_create
+// 2.向epoll中添加事件        AddEvent
+// 3.从就绪队列中获取就绪事件  wait
+// 4.从epoll中删除事件        DelEvent
+
 #pragma once
 
 #include <iostream>
@@ -24,7 +32,7 @@ public:
             lg.LogMessage(Fatal, "epoll_create error, %s : %d\n", strerror(errno), errno);
             exit(-1);
         }
-        lg.LogMessage(Fatal, "epoll_create suceess, epfd: %d\n", _epfd);
+        lg.LogMessage(Info, "epoll_create suceess, epfd: %d\n", _epfd);
     }
 
     void AddEvent(int sockfd, uint32_t events)
@@ -35,7 +43,7 @@ public:
 
         int n = ::epoll_ctl(_epfd, EPOLL_CTL_ADD, sockfd, &ev);
         if(n < 0)
-        {
+        {   
             lg.LogMessage(Error, "epoll_ctl add fatal, %s : %d\n", strerror(errno), errno); 
         }
     }

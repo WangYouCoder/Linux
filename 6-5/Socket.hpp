@@ -7,7 +7,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-
+#include "Common.hpp"
 const static int defaultsockfd = -1;
 const static int defaultbacklog = 5;
 
@@ -69,6 +69,7 @@ public:
         _sockfd = socket(AF_INET, SOCK_STREAM, 0);
         if (_sockfd < 0)
             exit(SocketError);
+        SetNonBlock(_sockfd);
     }
     void BindSocketOrDie(uint16_t port) override
     {

@@ -1,3 +1,11 @@
+
+// Connection是将没一个连接对象的各个属性描述组装了起来，TcpServer是将其再进行管理
+// 由于可能会有多个连接到来，所以需要将所有的Connection与其相对应的fd管理起来 unorder_map
+// 而每一个fd由有其相对于的读写事件，因此需要一个struct epoll_event 数组将所有的事件管理起来
+
+// 解释Connection中的回调函数：当在就绪队列中发现已就绪事件后，会进行识别是哪一种事件(读、写、异常)
+// 识别出来后，通过其fd找到所对应的Connection对象，在使用Connection对象通过回调函数，调用其相应事件的函数
+
 #pragma once
 #include <iostream>
 #include <string>
@@ -6,17 +14,7 @@
 #include "Epoller.hpp"
 #include "Log.hpp"
 
-class TcpServer;
-class ConnectionFactory
-{
-public:
-    Connection *BuildListenConnection(int listensock, func_t recver)
-    {
-        Connection *conn = new Connection(listensock);
-        conn->RegisterFunc(recver, nullptr, nullptr);
-        return conn;
-    }
-};
+
 
 // 用来管理Connection
 class TcpServer
@@ -38,7 +36,7 @@ public:
         _connections[conn->Getsockfd()] = conn;
         lg.LogMessage(Info, "add a new connection success, sockfd: %d\n", conn->Getsockfd());
         // 让epoller管理起来
-        _epoller.AddEvent(conn->Getevent(), conn->Getevent());
+        _epoller.AddEvent(conn->Getsockfd(), conn->Getevent());
     }
     void Looponce()
     {
@@ -74,6 +72,7 @@ public:
         _isrunning = true;
         while (_isrunning)
         {
+            std::cout << "---------------" << std::endl;
             Looponce();
         }
         _isrunning = false;
@@ -84,6 +83,7 @@ private:
     Epoller _epoller;
     struct epoll_event _revs[gmaxevents];
     int _timeout;
+
     std::unordered_map<int, Connection *> _connections;
     bool _isrunning;
 };
