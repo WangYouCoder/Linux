@@ -48,6 +48,19 @@ public:
         }
     }
 
+    void Modify(int sockfd, uint32_t event)
+    {
+        struct epoll_event ev;
+        ev.events = event;
+        ev.data.fd = sockfd;
+
+        int n = ::epoll_ctl(_epfd, EPOLL_CTL_MOD, sockfd, &ev);
+        if(n < 0)
+        {   
+            lg.LogMessage(Error, "epoll_ctl mod fatal, %s : %d\n", strerror(errno), errno); 
+        }
+    }
+
     int Wait(struct epoll_event *revs, int maxevents, int timeout)
     {
         struct epoll_event ev;
@@ -57,7 +70,6 @@ public:
 
     void DelEvent(int sockfd)
     {
-
         int n = ::epoll_ctl(_epfd, EPOLL_CTL_DEL, sockfd, nullptr);
         if(n < 0)
         {

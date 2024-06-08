@@ -40,6 +40,40 @@ public:
         _client = c;
     }
 
+    void AddInbuffer(std::string buffer)
+    {
+        _inbuffer += buffer;
+    }
+
+    std::string& GetInbuffer()
+    {
+        return _inbuffer;
+    }
+
+    void AddOutbuffer(std::string buffer)
+    {
+        _outbuffer += buffer;
+    }
+
+    std::string& GetOutbuffer()
+    {
+        return _outbuffer;
+    }
+
+    void SetEvent(uint32_t event)
+    {
+        _event = event;
+    }
+
+    bool IsNeedSend()
+    {
+        return !_outbuffer.empty();
+    }
+
+    void Close()
+    {
+        ::close(_sockfd);
+    }
     ~Connection()
     {
     }

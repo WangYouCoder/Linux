@@ -26,9 +26,9 @@ public:
             {
                 lg.LogMessage(Info, "get a new link, sockfd is: %d\n", sockfd);
                 SetNonBlock(sockfd);
-                auto recver = std::bind(&HandlerConnection::recver, std::placeholders::_1);
-                auto sender = std::bind(&HandlerConnection::sender, std::placeholders::_1);
-                auto excepter = std::bind(&HandlerConnection::excepter, std::placeholders::_1);
+                auto recver = std::bind(&HandlerConnection::Recver, std::placeholders::_1);
+                auto sender = std::bind(&HandlerConnection::Sender, std::placeholders::_1);
+                auto excepter = std::bind(&HandlerConnection::Excepter, std::placeholders::_1);
 
                 Connection *normal_conn = ConnectionFactory::BuildNormalConnection(sockfd, recver, sender, excepter, EPOLLIN | EPOLLET, conn->_R);
                 conn->_R->AddConnection(normal_conn);
