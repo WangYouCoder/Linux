@@ -7,7 +7,7 @@
 // MYSQL_RES *res_ptr;
 // MYSQL_ROW sqlrow;
 // unsigned int timeout = 7; //超时时间7秒
- 
+
 // void dispaly_row(MYSQL *ptr)
 // {
 //     unsigned int field_count = 0;
@@ -18,7 +18,7 @@
 //     }
 //     printf("\n");
 // }
- 
+
 // void display_header()
 // {
 //     MYSQL_FIELD *field_ptr;
@@ -61,7 +61,7 @@
 //         printf("mysql_init failed!\n");
 //         return -1;
 //     }
- 
+
 //     ret = mysql_options(conn_ptr, MYSQL_OPT_CONNECT_TIMEOUT, (const char *)&timeout); //设置超时选项
 //     if (ret)
 //     {
@@ -71,7 +71,7 @@
 //     if (conn_ptr)
 //     {
 //         printf("Connection Succeed!\n");
- 
+
 //         ret = mysql_query(conn_ptr, "SELECT * FROM user"); //执行SQL语句
 //         if (!ret)
 //         {
@@ -85,13 +85,13 @@
 //                     dispaly_row(conn_ptr);//打印表中的内容
 //                 }
 //             }
- 
+
 //             if (mysql_errno(conn_ptr))
 //             {
 //                 printf("Connect Erro:%d %s\n", mysql_errno(conn_ptr), mysql_error(conn_ptr)); //返回错误代码、错误消息
 //                 return -2;
 //             }
- 
+
 //             mysql_free_result(res_ptr);
 //         }
 //         else
@@ -99,7 +99,7 @@
 //             printf("Connect Erro:%d %s\n", mysql_errno(conn_ptr), mysql_error(conn_ptr)); //返回错误代码、错误消息
 //             return -3;
 //         }
- 
+
 //         mysql_close(conn_ptr);
 //         printf("Connection closed!\n");
 //     }
@@ -112,16 +112,103 @@
 //         }
 //         return -2;
 //     }
- 
+
 //     return 0;
 // }
 
-
 #include <iostream>
 #include <mysql/mysql.h>
+#include <string>
+#include <unistd.h>
+
+const std::string host = "127.0.0.1";
+const std::string user = "wy";
+const std::string passwd = "li030413";
+const std::string db = "conn";
+const unsigned int port = 3306;
 
 int main()
 {
-    std::cout << "mysql client version" << mysql_get_client_info() << std::endl;
+    // std::cout << "mysql client version" << mysql_get_client_info() << std::endl;
+
+    MYSQL *my = mysql_init(nullptr);
+    if (nullptr == my)
+    {
+        std::cerr << "init Mysql error " << std::endl;
+        return 1;
+    }
+
+    if (mysql_real_connect(my, host.c_str(), user.c_str(), passwd.c_str(), db.c_str(), port, nullptr, 0) == nullptr)
+    {
+        std::cerr << "connect MySQL error" << std::endl;
+    }
+    std::cout << "connect MySQL success" << std::endl;
+
+    mysql_set_character_set(my, "utf8");
+    // std::string sql = "insert into user (name,age,telphone) values ('李四', 21, '46484651')";
+    std::string sql = "select * from user"; 
+
+    int n = mysql_query(my, sql.c_str());
+    if(n == 0) std::cout << sql << " success " << std::endl;
+    else
+    {
+        std::cerr << sql << " failed: " << n << std::endl;
+        return -1;
+    }
+
+    MYSQL_RES *res = mysql_store_result(my);
+    if (nullptr == res)
+    {
+        std::cerr << "mysql_store_result failed ! ! !" << std::endl;
+        return -1;
+    }
+
+    my_ulonglong rows = mysql_num_rows(res);
+    my_ulonglong fields = mysql_num_fields(res);
+
+    std::cout << "行: " << rows << std::endl;
+    std::cout << "列: " << fields << std::endl;
+
+    // 属性
+    MYSQL_FIELD *fields_array = mysql_fetch_field(res);
+    for(my_ulonglong i = 0; i < fields; i++)
+    {
+        std::cout << fields_array[i].name << "\t";
+    }
+    std::cout << "\n";
+
+    // 内容
+    for(my_ulonglong i = 0; i < rows; i++)
+    {
+        MYSQL_ROW row = mysql_fetch_row(res);
+        for(my_ulonglong j = 0; j < fields; j++)
+        {
+            std::cout << row[j] << "\t";
+        }
+        std::cout << "\n";
+    }
+
+
+    // while (true)
+    // {
+    //     std::cout << "MySQL> ";
+    //     if (!std::getline(std::cin, sql))
+    //         break;
+    //     if (sql == "quit")
+    //         break;
+
+    //     int n = mysql_query(my, sql.c_str());
+    //     if (n == 0)
+    //     {
+    //         std::cout << sql << "success:" << n << std::endl;
+    //     }
+    //     else
+    //     {
+    //         std::cerr << sql << " failed: " << n << std::endl;
+    //     }
+    // }
+
+    mysql_free_result(res);
+    mysql_close(my);
     return 0;
 }
