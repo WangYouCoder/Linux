@@ -1,7 +1,12 @@
+// 声明语法版本
 syntax = "proto3";
+
+// 声明代码的命名空间
 package contacts;
 
+//结构化对象的描述
 message PeopleInfo{
+    // 各个字段描述:   字段类型  字段名 = 字段唯一编号
     string name = 1;
     int32 age = 2;
 }

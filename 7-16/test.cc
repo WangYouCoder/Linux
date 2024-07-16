@@ -3,7 +3,7 @@
 using namespace std;
 int main()
 {
-    string people_str;
+    string people_str;  
 
     {
         contacts::PeopleInfo people;
