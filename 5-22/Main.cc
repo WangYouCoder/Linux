@@ -16,7 +16,7 @@ std::string HandlerHttpRequest(std::string &request)
     req.Deserialize(request);
     req.DebugHttp();
 
-    std::string content = "<html><h1>hello bite</h1></html>";
+    std::string content = "<html><h1>hello world</h1></html>";
     std::string httpstatusline = "Http/1.0 200 OK\r\n";
     std::string httpheader = "Content-Length: " + std::to_string(content.size()) + "\r\n";
     httpheader += "\r\n";

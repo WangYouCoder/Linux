@@ -42,9 +42,9 @@ public:
         ev.data.fd = sockfd;
 
         int n = ::epoll_ctl(_epfd, EPOLL_CTL_ADD, sockfd, &ev);
-        if(n < 0)
-        {   
-            lg.LogMessage(Error, "epoll_ctl add fatal, %s : %d\n", strerror(errno), errno); 
+        if (n < 0)
+        {
+            lg.LogMessage(Error, "epoll_ctl add fatal, %s : %d\n", strerror(errno), errno);
         }
     }
 
@@ -55,9 +55,9 @@ public:
         ev.data.fd = sockfd;
 
         int n = ::epoll_ctl(_epfd, EPOLL_CTL_MOD, sockfd, &ev);
-        if(n < 0)
-        {   
-            lg.LogMessage(Error, "epoll_ctl mod fatal, %s : %d\n", strerror(errno), errno); 
+        if (n < 0)
+        {
+            lg.LogMessage(Error, "epoll_ctl mod fatal, %s : %d\n", strerror(errno), errno);
         }
     }
 
@@ -71,7 +71,7 @@ public:
     void DelEvent(int sockfd)
     {
         int n = ::epoll_ctl(_epfd, EPOLL_CTL_DEL, sockfd, nullptr);
-        if(n < 0)
+        if (n < 0)
         {
             lg.LogMessage(Error, "epoll_ctl del error, %s : %d\n", strerror(errno), errno);
         }
@@ -79,7 +79,7 @@ public:
 
     ~Epoller()
     {
-        if(_epfd >= 0)
+        if (_epfd >= 0)
         {
             close(_epfd);
         }

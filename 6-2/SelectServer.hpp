@@ -34,6 +34,7 @@ private:
                     if (sock == nullptr)
                     {
                         lg.LogMessage(Error, "accept error\n");
+                        continue;
                     }
 
                     lg.LogMessage(Info, "get a client, client info is: %s:%d, fd: %d\n", clientip.c_str(), clientport, sock->GetSockfd());
